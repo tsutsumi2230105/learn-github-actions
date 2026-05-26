@@ -1,0 +1,66 @@
+name: Node.js CI
+
+# このワークフローの名前です。
+# GitHub の Actions 画面では Node.js CI という名前で表示されます。
+
+on:
+  push:
+    branches: [main]
+
+# 「いつ実行するか」を指定しています。
+# この場合は、main ブランチに push されたときに実行されます。
+# つまり、ローカルで変更して GitHub に反映したタイミングで、自動的にチェックが走ります。
+
+# これは、「main ブランチに push されたときだけ実行する」
+# という意味です。
+
+jobs:
+  build:
+
+#   実行する作業のまとまりを job と呼びます。
+# ここでは build という名前の job を1つ定義しています。
+
+    name: Build and Test
+
+#     この job の表示名です。
+# Actions の実行結果画面では Build and Test と表示されます。
+
+    runs-on: ubuntu-latest
+# この job を実行する環境です。
+# ubuntu-latest は、GitHub が用意している最新の Ubuntu Linux 環境を使うという意味です。
+
+    steps:
+# job の中で実行する手順です。
+# 上から順番に実行されます。
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+# GitHub 上のリポジトリのコードを、実行環境に取り込む処理です。
+# これをしないと、GitHub Actions の中で index.js や package.json などのファイルを使えません。
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+# Node.js を準備する処理です。
+# node-version: "20" は Node.js のバージョン 20 を使うという意味です。
+# cache: "npm" は、npm の依存関係インストールを速くするためのキャッシュ設定です。
+# 毎回ゼロから準備するより、前回の情報を使える場合があります。
+
+
+      - name: Install dependencies
+        run: npm install  
+# 依存関係をインストールします。
+# package.json に書かれているライブラリを npm install で入れます。
+
+      - name: Run tests
+        run: npm test
+# テストを実行します。
+# package.json の中にある scripts.test に設定されたコマンドが動きます。
+
+
+# GitHub Actions は毎回、空の仮想マシン上で実行されます。
+# そのままだと index.js や package.json など、リポジトリ内のファイルが存在しません。
